@@ -113,10 +113,10 @@ function getAnonId(users) {
 
 /* Simple heartbeat to keep clients from timing out */
 function sendHeartbeat(){
-    setTimeout(sendHeartbeat, 10000);
-    io.sockets.emit('ping', { beat : 5 });
+    setTimeout(sendHeartbeat, 8000);
+    io.sockets.emit('ping', { beat : 1 });
 }
-setTimeout(sendHeartbeat, 10000);
+setTimeout(sendHeartbeat, 8000);
 
 /* All socket.IO events are handled here, this is the real-time engine we're using */
 io.on('connection', function(socket){

@@ -21,7 +21,7 @@ function init() {
 	
 	// Simple client heartbeat to keep from timing out.
 	socket.on('ping', function(data){
-      socket.emit('pong', {beat: 5});
+      socket.emit('pong', {beat: 1});
     });
 	
 	// On client successful connect, record sessionID of client.
