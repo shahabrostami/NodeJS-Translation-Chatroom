@@ -1,0 +1,27 @@
+doctype html
+html
+	head
+		link(rel='stylesheet', href='/css/style.css')
+		script(type='text/javascript', src="/js/socket.io.js")
+		script(type='text/javascript', src='/js/jquery-1.11.1.min.js')
+		script(type='text/javascript', src='/js/index.js')
+		title WTS Node Example
+	body
+		div.info
+			h1 Translation Node Chat
+			h2 where magic happens, probably
+			div.chatMain
+				form#messageForm
+				div.chatTop
+					| Name: 
+					input(type="text", readonly="readonly" value="name")#name 
+					| Language:
+					select#languages
+				div.chatLeft
+					| Chat: 
+					textarea(readonly="readonly")#chatWindow
+				div.chatRight
+					| Users: 
+					textarea(readonly="readonly")#userWindow
+				div.chatBottom
+					input(type="text", placeholder="Enter message here")#message 
