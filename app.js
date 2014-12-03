@@ -18,14 +18,9 @@ var express = require('express')
 	, io = require('socket.io').listen(http)
 	, _ = require('underscore');
 
-// The IP address of the Cloud Foundry DEA (Droplet Execution Agent) that hosts this application:
-var host = (process.env.VCAP_APP_HOST || 'localhost');
-// The port on the DEA for communication with the application:
-var port = (process.env.VCAP_APP_PORT || 3000);
+var host = 'localhost';
+var port = 3000;
 
-/* Set up Server Configuration */
-//app.set('ip', 'wtschat.stage1.mybluemix.net');
-//app.set('port', '8080');
 
 app.set('ip', host);
 app.set('port', port);
@@ -39,11 +34,9 @@ app.use(express.bodyParser());
 /* Set up participant array 
 Struct: id (sessionID), name (nickname), language, isAnon (true/false)*/
 var users = [];
-var services = JSON.parse(process.env.VCAP_SERVICES || "{}");
 
-/* Setup HTTP options, including translation URI and langauges array 
-   SET UP WTS INSTANCE URL HERE */
-var translateURL = "http://37.58.104.74:9080/translation/services/translate";
+/* Setup HTTP options, including translation URI and langauges array */
+var translateURL = "";
 var languages = [];
 var options = {
       uri: translateURL,
