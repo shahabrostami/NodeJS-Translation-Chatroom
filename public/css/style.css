@@ -38,17 +38,8 @@ div.info li {
 }
 
 div.info img {
+    float:right;
 	display: block;
-	margin: auto;
-	height: auto;
-}
-
-div.info:hover {
-	padding: 0;
-}
-
-div.info img:hover {
-	width: 38px;
 	height: auto;
 }
 
@@ -80,7 +71,30 @@ div.chatTop {
 	margin: auto;
 	float: left;
 	width: 100%;
-	height: 10%;
+	height: 5%;
+}
+
+div.name {
+	margin: auto;
+	float: left;
+    padding-left:0px;
+	height: 100%;
+}
+
+div#language {
+	margin: auto;
+	float: right;
+	width: 20%;
+	height: 100%;
+    text-align: left;
+}
+
+div#languageRight{
+    margin: auto;
+	float: left;
+	width: 10%;
+	height: 100%;
+    text-align: left;
 }
 
 div.chatBottom {
@@ -105,6 +119,7 @@ div.chatBottom  #send{
 }
 
 div.chatLeft  {
+    padding-top:2em;
 	margin: auto;
 	float: left;
 	width: 75%;
@@ -118,6 +133,7 @@ div.chatLeft  textarea {
 }
 
 div.chatRight  {
+    padding-top:2em;
 	margin: auto;
 	float: right;
 	width: 20%;
@@ -125,8 +141,84 @@ div.chatRight  {
 	resize:none;
 }
 
-div.chatRight  textarea {
+div#userWindow {
+    margin-top:0.5em;
 	width: 100%;
 	height: 90%;
 	resize:none;
+	border: 1px solid;
+	border-color: grey;
+}
+
+div #chatWindow {
+    margin-top:0.5em;
+	overflow-y:scroll;
+	overflow-x:hidden;
+	word-wrap: break-word;
+	border: 1px solid;
+	border-color: grey;
+	height: 91%;
+}
+
+
+div#languages{
+    float:right;
+}
+div#languageSet {
+    float: right;
+}
+
+input#submit {
+    position:absolute; 
+    top:-1000px;
+}
+
+
+input#nameStartup{
+    width:100%;
+    margin-bottom:2px;
+}
+
+div.left {
+    width: 40%;
+    float: left;
+    text-align: right;
+}
+div.right {
+    width: 55%;
+    margin-left: 10px;
+    float:left;
+}
+
+div p {
+    text-align:left;
+    position:centre;
+    margin: 1px;
+}
+
+input#name,
+input#languageSet{
+    border: 0px;
+    font-weight:bold;
+    padding-left: 1em;
+}
+div#userWindow img{
+    float: left; 
+    margin:1px;
+    padding-right:5px;
+}
+
+div#chatWindow img{
+    float:left;
+    margin:1px;
+    padding-right:5px;
+}
+
+div#chatWindow hr{
+margin:0px;
+}
+
+p {
+    padding-top:2px;
+    padding-left:2px;
 }
