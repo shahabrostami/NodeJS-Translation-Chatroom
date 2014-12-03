@@ -1,27 +1,46 @@
 doctype html
 html
-	head
-		link(rel='stylesheet', href='/css/style.css')
-		script(type='text/javascript', src="/js/socket.io.js")
-		script(type='text/javascript', src='/js/jquery-1.11.1.min.js')
-		script(type='text/javascript', src='/js/index.js')
-		title WTS Node Example
-	body
-		div.info
-			h1 Translation Node Chat
-			h2 where magic happens, probably
-			div.chatMain
-				form#messageForm
-				div.chatTop
-					| Name: 
-					input(type="text", readonly="readonly" value="name")#name 
-					| Language:
-					select#languages
-				div.chatLeft
-					| Chat: 
-					textarea(readonly="readonly")#chatWindow
-				div.chatRight
-					| Users: 
-					textarea(readonly="readonly")#userWindow
-				div.chatBottom
-					input(type="text", placeholder="Enter message here")#message 
+    head
+        link(rel='stylesheet', href="/css/style.css")
+        link(rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css")
+        script(type='text/javascript', src="/js/socket.io.js")
+        script(type='text/javascript', src='/js/jquery-1.11.1.min.js')
+        script(type='text/javascript', src='/js/index.js')
+        script(type='text/javascript', src="//code.jquery.com/jquery-1.10.2.js")
+        script(type='text/javascript', src="//code.jquery.com/ui/1.11.2/jquery-ui.js")
+        title WTS Node Example
+    body
+        div.info
+            h1 Language Translation Chat
+            h2 powered by WebSphere Translation Service on BlueMix
+            div.chatMain
+                hr
+                form#messageForm
+                div.chatTop
+                    div.name
+                        | Name: 
+                        input(type="text", readonly="readonly", value="Your Name")#name 
+                    div#language
+                        | Your Language:
+                hr
+                div.chatLeft
+                    | Chat: 
+                    div#chatWindow
+                div.chatRight
+                    | Users: 
+                    div#userWindow
+                div.chatBottom
+                    input(type="text", placeholder="Enter message here")#message 
+                div#dialog(title = "Your Name")
+                    form
+                        div.left
+                            label Name:
+                        div.right
+                            input(type="text", value="", maxlength="10")#nameStartup
+                        br
+                        div.left
+                            label Language:
+                        div.right
+                            select#languages
+                        input(type="submit", tabindex="-1")#submit
+                        

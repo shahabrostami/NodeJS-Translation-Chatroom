@@ -1,6 +1,6 @@
 /* 
 		Created by Shahab Rostami
-		shbrostami@gmail.com
+		rostami@uk.ibm.com
 		
 		Module dependencies
 		- Express
@@ -18,9 +18,17 @@ var express = require('express')
 	, io = require('socket.io').listen(http)
 	, _ = require('underscore');
 
+// The IP address of the Cloud Foundry DEA (Droplet Execution Agent) that hosts this application:
+var host = (process.env.VCAP_APP_HOST || 'localhost');
+// The port on the DEA for communication with the application:
+var port = (process.env.VCAP_APP_PORT || 3000);
+
 /* Set up Server Configuration */
-app.set('ip', '127.0.0.1');
-app.set('port', '8080');
+//app.set('ip', 'wtschat.stage1.mybluemix.net');
+//app.set('port', '8080');
+
+app.set('ip', host);
+app.set('port', port);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 
@@ -34,8 +42,8 @@ var users = [];
 var services = JSON.parse(process.env.VCAP_SERVICES || "{}");
 
 /* Setup HTTP options, including translation URI and langauges array 
-   SET UP TRANSLATION SERVICE URL HERE */
-var translateURL = null;
+   SET UP WTS INSTANCE URL HERE */
+var translateURL = "http://37.58.104.74:9080/translation/services/translate";
 var languages = [];
 var options = {
       uri: translateURL,
@@ -60,8 +68,7 @@ var callbackSupportedLanguages = function(error, res, body)
     }
 };
 // Send a request to return all languages supported, and when complete, store these into an array.
-if(translateURL != null)
-	request(options, callbackSupportedLanguages);
+request(options, callbackSupportedLanguages);
 
 /* Handle the translation of text */
 var translateText = function(data, functionCallback)
@@ -113,10 +120,10 @@ function getAnonId(users) {
 
 /* Simple heartbeat to keep clients from timing out */
 function sendHeartbeat(){
-    setTimeout(sendHeartbeat, 8000);
+    setTimeout(sendHeartbeat, 10000);
     io.sockets.emit('ping', { beat : 1 });
 }
-setTimeout(sendHeartbeat, 8000);
+setTimeout(sendHeartbeat, 10000);
 
 /* All socket.IO events are handled here, this is the real-time engine we're using */
 io.on('connection', function(socket){
@@ -124,21 +131,18 @@ io.on('connection', function(socket){
 	var newAnonId = getAnonId(users);
 	socket.emit('initChat', {newAnonId : newAnonId, languages : languages});
 	
-	/* Function to handle heartbeat on client connection */
-	socket.on('pong', function(data){
-        console.log("Pong received from client");
-    });
-	
-	/* Once the user registers,  update the user list and notify other users connected. */
+    /* Once the user registers,  update the user list and notify other users connected. */
 	socket.on('registerUser', function(data){
-		users.push({
-			id : data.id, 
-			name : data.name,
-			language: data.language,
-			isAnon : data.isAnon
-		});
-		// Notify other users.
-		io.emit('userConnected', {users: users, name: data.name});
+        
+            users.push({
+                id : data.id, 
+                name : data.name,
+                language: data.language,
+                isAnon : data.isAnon
+            });
+            users = _.uniq(users);
+            // Notify other users.
+            io.emit('userConnected', {users: users, name: data.name, language: data.language});
 	});
 	
 	/* What to do if we receive a message */
@@ -155,7 +159,7 @@ io.on('connection', function(socket){
 			// If the user returned is the same as the user that sent the message, simply send the non-translated message back.
 			if(toUser.id === fromUser.id)
 			{
-				toSocket.emit('newMessage', {name: fromUser.name, message: data.message});
+				toSocket.emit('newMessage', {name: fromUser.name, message: data.message, fromLanguage: fromUser.language});
 			}
 			// Else, we know that the user may potentially require a translation of the message to be sent.
 			else
@@ -163,28 +167,22 @@ io.on('connection', function(socket){
 				// If the user receiving the message has the same language as the user that sent the message, simply send the non-translated message back.
 				if(toUser.language == fromUser.language)
 				{
-					toSocket.emit('newMessage', {name: fromUser.name, message: data.message});
+					toSocket.emit('newMessage', {name: fromUser.name, message: data.message, fromLanguage: fromUser.language});
 				}
 				else
 				{
 					// Else, we know that a translation is required, translate the message and send to the appropriate user when completed.
-					translateText({toUser : toUser, fromUser : fromUser, text : data.message},
+					translateText({toUser : toUser, fromUser : fromUser, text : data.message, fromLanguage: fromUser.language},
 					function (error, response, body) {
 						if(!error && response.statusCode == 200)
 						{
 							toSocket = io.sockets.connected[response.request.headers['toUser']];
-							toSocket.emit('newMessage', {name: fromUser.name, message: body});
+							toSocket.emit('newMessage', {name: fromUser.name, message: body, fromLanguage: fromUser.language});
 						}
 					});
 				}
 			}
 		}
-	});
-	
-	/* What to do if language has been changed */
-	socket.on('updateLanguage', function(data) {
-		// Find that user and update their language.
-		_.findWhere(users, {id:socket.id}).language = data.language;
 	});
 	
 	// If user disconnects, update variables as required.
@@ -193,13 +191,28 @@ io.on('connection', function(socket){
 		user = _.findWhere(users, {id: socket.id});
 		
 		// Remove the user from the list.
-		users = _.without(users, user);
-		io.emit('userDisconnected', {users: users, name: user.name});
+		if(typeof(user) != "undefined")
+		{
+			users = _.without(users, user);
+			io.emit('userDisconnected', {users: users, name: user.name, language: user.language});
+		}
   });
+    
+    /* Function to handle heartbeat on client connection */
+	socket.on('pong', function(data){
+        console.log("Heartbeat from client");
+    });
 });
 
 /* HTTP server start at defined port and ip address. */
 http.listen(app.get('port'), app.get('ip'), function() {
 	console.log('Up and running, go to ' + app.get('ip') + ':' + app.get('port'));
 });
+
+process.on( 'SIGINT', function() {
+  console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
+  shutDownMessage = "Server is currently unavailable.";
+  io.emit('shutdown', {message: shutDownMessage});
+  process.exit( );
+})
 	
